@@ -1,4 +1,4 @@
-import { Block } from "./infra/etherscan";
+import { Block } from "../infra/etherscan";
 import { getBalanceChanges, getMostChangedAddress } from "./mostChangedBalance";
 
 describe("Index", () => {
