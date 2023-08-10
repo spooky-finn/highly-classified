@@ -1,5 +1,5 @@
 import axios from "axios";
-import { parralдelRequest, withRetry } from "../asynchelpers";
+import { PromiseBatcher, withRetry } from "../asynchelpers";
 
 const API_RPS_TRESHOLD = 5;
 const API_KEY = "31TDR81FX126W98P3Z345FFQMGIJJBIB6S";
@@ -57,27 +57,17 @@ export default class EtherscanApi {
     const lastBlock = await this.latestBlockNumber();
     const startBlock = Math.max(0, lastBlock - n + 1);
 
-    const promises: Array<() => Promise<Block>> = [];
+    const batcher = new PromiseBatcher<Block>(API_RPS_TRESHOLD);
 
-    const blocks: Block[] = [];
     for (
       let blockNumber = startBlock;
       blockNumber <= lastBlock;
       blockNumber++
     ) {
       const cb = () => withRetry(() => this.blockByNumber(blockNumber));
-      promises.push(cb);
+      batcher.add(cb);
     }
 
-    for (let i = 0; i < promises.length; i += API_RPS_TRESHOLD) {
-      const batch = promises.slice(i, i + API_RPS_TRESHOLD);
-      blocks.push(...(await parralдelRequest(batch)));
-
-      if (n % blocks.length === 0) {
-        console.log("pulled", blocks.length, "blocks");
-      }
-    }
-
-    return blocks;
+    return batcher.run();
   }
 }

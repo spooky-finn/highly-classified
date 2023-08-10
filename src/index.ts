@@ -15,6 +15,6 @@ app.get("/most_changed_balance", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 });

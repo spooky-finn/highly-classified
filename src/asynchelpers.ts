@@ -4,7 +4,7 @@ export class PromiseBatcher<R> {
   private queue: Array<() => Promise<R>> = [];
   private results: R[] = [];
 
-  constructor(private readonly rps: number) {}
+  constructor(private readonly max_rps: number) {}
 
   public add(promise: () => Promise<R>) {
     this.queue.push(promise);
@@ -43,15 +43,14 @@ export class PromiseBatcher<R> {
   }
 
   private async executeBatch() {
-    const batch = this.queue.splice(0, this.rps);
+    const batch = this.queue.splice(0, this.max_rps);
+    console.log(
+      "sending new batch. remains:",
+      this.queue.length / this.max_rps
+    );
     const res = await Promise.all(batch.map((each) => each()));
     this.results.push(...res);
   }
-}
-
-export async function parralдelRequest<R>(requests: (() => Promise<R>)[]) {
-  const res = Promise.all(requests.map((request) => request()));
-  return res;
 }
 
 export async function withRetry<R>(
