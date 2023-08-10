@@ -1,5 +1,5 @@
 import axios from "axios";
-import { parralдelRequest, withRetry } from "../src/asynchelpers";
+import { parralдelRequest, withRetry } from "../asynchelpers";
 
 const API_RPS_TRESHOLD = 5;
 const API_KEY = "31TDR81FX126W98P3Z345FFQMGIJJBIB6S";
